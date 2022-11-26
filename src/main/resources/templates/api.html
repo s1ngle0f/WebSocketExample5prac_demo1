@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        var params = {
+            "url": "https://api.openweathermap.org/data/2.5/weather?q=Moscow&units=metric&appid=fe9f3739c59f99bcd66879e9dd9f4c49",
+            "method": "GET",
+            "timeout": 0
+        };
+
+        $.ajax(params).done(function (response, xhr) {
+                console.log(response);
+                console.log(xhr);
+                $("#location_lon").append(response.coord.lon);
+                $("#location_lat").append(response.coord.lat);
+                $("#temperature").append(response.main.temp);
+                $("#temperature_max").append(response.main.temp_max);
+                $("#temperature_min").append(response.main.temp_min);
+            }
+        );
+    </script>
+</head>
+<body>
+    Location: {
+        <div id="location_lon"></div>
+        <div id="location_lat"></div>
+    }<br/>
+    Temperature: <div id="temperature"></div><br/>
+    Temperature Max: <div id="temperature_max"></div><br/>
+    Temperature Min: <div id="temperature_min"></div><br/>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script>
+        function connect() {
+            var socket = new SockJS('/websockets_app');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/toclients', function (greeting) {
+                    var content = JSON.parse(greeting.body);
+                    insert(content.name, content.message);
+                });
+            });
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendName() {
+            stompClient.send("/app/toserver", {}, JSON.stringify({'name': $("#name").val(),
+                                                                  'message': $("#message").val()}));
+        }
+
+        function create(htmlStr) {
+            var frag = document.createDocumentFragment(),
+                temp = document.createElement('div');
+            temp.innerHTML = htmlStr;
+            while (temp.firstChild) {
+                frag.appendChild(temp.firstChild);
+            }
+            return frag;
+        }
+
+        function insert(name, message)
+        {
+            // let div = document.createElement('div');
+            // div.className = "message";
+            // div.innerHTML = "<p>Hi there!</p> You've read an important message.";
+            // document.getElementsByClassName("messages").;
+            messages.insertAdjacentHTML("afterbegin", '<p>'+name+': '+message+'</p>');
+        }
+
+        $(function () {
+            $("form").on('submit', function (e) {
+                e.preventDefault();
+            });
+            // $( "#connect" ).click(function() { connect(); });
+            // $( "#disconnect" ).click(function() { disconnect(); });
+            connect();
+            $( "#send" ).click(function() { sendName(); });
+        });
+    </script>
+</head>
+<body>
+    <form>
+        <label>Введите имя и сообщение: </label>
+        <input type="text" id="name">
+        <input type="text" id="message">
+        <button type="submit" id="send" name="send">Отправить</button>
+    </form>
+    <div class="messages" id="messages"></div>
+</body>
+</html>
